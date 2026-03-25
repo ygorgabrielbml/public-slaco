@@ -983,6 +983,7 @@
 
         dom.postsContainer.addEventListener("click", (event) => {
           if (event.target.closest(".comments-wrap")) return;
+          if (window.getSelection && window.getSelection().toString()) return;
 
           const card = event.target.closest(".post-card[data-post-id]");
           if (!card) return;
