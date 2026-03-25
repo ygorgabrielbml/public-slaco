@@ -3,80 +3,1009 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slaco Dashboard</title>
+    <title>Internal Communication Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         --bg: #0d0d0d;
+        --bg-soft: #141414;
         --panel: #171717;
+        --panel-2: #1f1f1f;
         --line: #2b2b2b;
-        --text: #f3f3f3;
-        --text-soft: #a5a5a5;
+        --line-soft: #232323;
+        --text: #f6f6f6;
+        --text-soft: #9f9f9f;
+        --accent: #14c8ad;
+        --accent-2: #0f8fdb;
+        --accent-soft: rgba(20, 200, 173, 0.16);
+        --danger: #ff5a5f;
+        --radius: 18px;
+        --radius-sm: 12px;
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
       }
-      * { box-sizing: border-box; }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         height: 100vh;
         overflow: hidden;
         font-family: "Manrope", sans-serif;
-        background: var(--bg);
+        background:
+          radial-gradient(circle at 85% -10%, rgba(20, 200, 173, 0.12) 0%, transparent 40%),
+          radial-gradient(circle at 20% -15%, rgba(15, 143, 219, 0.16) 0%, transparent 36%),
+          var(--bg);
         color: var(--text);
       }
+
       .topbar {
-        max-width: 1280px;
+        position: relative;
+        z-index: 5;
+        background: transparent;
+      }
+
+      .topbar-row {
+        max-width: 1400px;
         margin: 0 auto;
+        padding: 1rem 1.2rem 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.2rem;
+      }
+
+      .brand {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font: inherit;
+      }
+
+      .toolbar {
+        min-width: 280px;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      .main {
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+        height: calc(100vh - 72px);
+        min-height: 0;
+        overflow: hidden;
+        padding: 1.4rem;
+        display: grid;
+        grid-template-rows: auto auto auto 1fr;
+        gap: 1rem;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 1rem;
+        padding: 1rem 1.1rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--line);
+        background: linear-gradient(120deg, rgba(24, 24, 24, 0.9) 0%, rgba(15, 15, 15, 0.9) 100%);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .header h2 {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(1.2rem, 2vw, 1.6rem);
+      }
+
+      .header p {
+        margin: 0.3rem 0 0;
+        color: var(--text-soft);
+      }
+
+      .search-input {
+        width: 280px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: #101010;
+        color: var(--text);
+        font-size: 0.9rem;
+        padding: 0.6rem 0.75rem;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .search-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(20, 200, 173, 0.12);
+      }
+
+      .filter-select {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: #101010;
+        color: var(--text);
+        font-size: 0.9rem;
+        padding: 0.58rem 0.65rem;
+        outline: none;
+      }
+
+      .error-banner {
+        display: none;
+        border: 1px solid rgba(255, 90, 95, 0.4);
+        color: #ffd9da;
+        background: rgba(255, 90, 95, 0.1);
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+      }
+
+      .error-banner.show {
+        display: block;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.8rem;
+      }
+
+      .stat-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        background: linear-gradient(140deg, #1a1a1a 0%, #141414 100%);
+        padding: 0.75rem 0.9rem;
+      }
+
+      .stat-label {
+        color: var(--text-soft);
+        font-size: 0.77rem;
+        margin: 0 0 0.3rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .stat-value {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.2rem;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
+        gap: 1rem;
+        min-height: 0;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, #171717 0%, #121212 100%);
         padding: 1rem;
+        min-height: 0;
+        height: 100%;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .panel-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 0.8rem;
       }
-      .topbar h1 {
-        margin: 0;
+
+      .panel h3 {
+        margin: 0 0 0.8rem;
         font-family: "Space Grotesk", sans-serif;
+        font-size: 1.04rem;
       }
-      .topbar input {
-        width: 300px;
-        padding: 0.6rem 0.7rem;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: #101010;
-        color: var(--text);
+
+      .panel .panel-head h3 {
+        margin: 0;
       }
-      .main {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 0 1rem 1rem;
-        height: calc(100vh - 74px);
+
+      .users-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        padding-right: 0.25rem;
       }
-      .panel {
+
+      .users-grid::-webkit-scrollbar,
+      .comments-wrap.open::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .users-grid::-webkit-scrollbar-thumb,
+      .comments-wrap.open::-webkit-scrollbar-thumb {
+        background: #2f2f2f;
+        border-radius: 999px;
+      }
+
+      #usersPanel {
+        min-height: 0;
+      }
+
+      #usersPanel #usersLoading {
+        align-self: start;
+      }
+
+      .user-card {
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: var(--panel);
+        border-radius: var(--radius-sm);
+        background: linear-gradient(160deg, #242424 0%, #1b1b1b 100%);
         padding: 1rem;
+        min-height: 150px;
+        cursor: pointer;
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        align-content: start;
+        gap: 0.12rem;
+        transition: transform 0.2s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
       }
-      .panel h2 { margin: 0 0 0.8rem; }
-      .placeholder { color: var(--text-soft); }
+
+      .user-card::before {
+        content: none;
+      }
+
+      .user-head {
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        gap: 0.65rem;
+        align-items: center;
+        margin-bottom: 0.55rem;
+      }
+
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #efefef;
+        border: 1px solid #3a3a3a;
+        background: #262626;
+      }
+
+      .user-card:hover,
+      .user-card:focus-visible {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      }
+
+      .user-card.active {
+        border-color: #595959;
+        background: linear-gradient(160deg, #2c2c2c 0%, #222 100%);
+      }
+
+      .user-card h4 {
+        margin: 0;
+        font-size: 1.03rem;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        min-height: 2.5em;
+      }
+
+      .user-meta {
+        margin: 0.1rem 0 0;
+        color: #d2d2d2;
+        font-size: 0.84rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .posts-list,
+      .comments-list {
+        display: grid;
+        gap: 0.78rem;
+      }
+
+      .posts-list {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        padding-right: 0.2rem;
+      }
+
+      .posts-list::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .posts-list::-webkit-scrollbar-thumb {
+        background: #2f2f2f;
+        border-radius: 999px;
+      }
+
+      .post-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
+        padding: 0.95rem;
+        min-height: 0;
+        cursor: pointer;
+        transition: border-color 0.25s ease, transform 0.25s ease;
+      }
+
+      .post-card:hover {
+        transform: translateY(-1px);
+      }
+
+      .post-card.open {
+        border-color: var(--accent);
+      }
+
+      .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 0.8rem;
+      }
+
+      .post-header h4 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .post-toggle {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #101010;
+        color: var(--text-soft);
+        padding: 0.2rem 0.5rem;
+        font-size: 0.74rem;
+      }
+
+      .post-card p {
+        color: var(--text-soft);
+        margin: 0.6rem 0 0;
+      }
+
+      .comments-wrap {
+        margin-top: 0.7rem;
+        background: #151515;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.2s ease;
+      }
+
+      .comments-wrap.open {
+        max-height: 170px;
+        opacity: 1;
+        padding: 0.55rem 0.65rem;
+        overflow: auto;
+        border-color: var(--line-soft);
+        pointer-events: auto;
+      }
+
+      .comment {
+        border-top: 1px solid var(--line-soft);
+        padding-top: 0.62rem;
+      }
+
+      .comment strong {
+        font-size: 0.88rem;
+      }
+
+      .comment small {
+        color: var(--text-soft);
+      }
+
+      .comment p {
+        margin: 0.3rem 0 0;
+        color: var(--text-soft);
+        font-size: 0.9rem;
+      }
+
+      .empty {
+        border: 1px dashed var(--line);
+        border-radius: var(--radius-sm);
+        padding: 1rem;
+        color: var(--text-soft);
+        background: rgba(255, 255, 255, 0.01);
+      }
+
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid #323232;
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0.5rem auto;
+      }
+
+      .skeleton {
+        height: 85px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #222 25%, #2d2d2d 37%, #222 63%);
+        background-size: 400% 100%;
+        animation: shimmer 1.3s ease infinite;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 100% 0;
+        }
+        100% {
+          background-position: 0 0;
+        }
+      }
+
+      @media (max-width: 1180px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .users-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 980px) {
+        .topbar-row {
+          flex-wrap: wrap;
+        }
+
+        .header {
+          flex-direction: column;
+        }
+
+        .toolbar {
+          width: 100%;
+          min-width: 0;
+          flex-wrap: wrap;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+          grid-template-rows: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .users-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .main {
+          height: calc(100vh - 70px);
+          padding: 1rem;
+        }
+
+        .search-input {
+          width: 100%;
+        }
+      }
     </style>
   </head>
   <body>
-    <header class="topbar">
-      <h1>Slaco</h1>
-      <input type="search" placeholder="Search employee..." />
-    </header>
+    <div class="topbar">
+      <div class="topbar-row">
+        <div class="brand"><h1>Slaco</h1></div>
+        <div class="toolbar">
+          <input
+            class="search-input"
+            id="searchInput"
+            type="search"
+            placeholder="Search employee by name or email..."
+            aria-label="Search employee"
+          />
+        </div>
+      </div>
+    </div>
+
     <main class="main">
-      <section class="panel">
-        <h2>Employees</h2>
-        <p class="placeholder">User cards will be loaded from API.</p>
-      </section>
-      <section class="panel">
-        <h2>Posts & Comments</h2>
-        <p class="placeholder">Posts and comments will be loaded after selecting a user.</p>
-      </section>
+        <header class="header">
+          <div>
+            <h2>Internal Communication Hub</h2>
+            <p>Browse users, posts, and threaded comments in real time</p>
+          </div>
+        </header>
+
+        <div id="errorBanner" class="error-banner" role="alert" aria-live="assertive"></div>
+
+        <section class="stats-grid" aria-label="Dashboard metrics">
+          <article class="stat-card">
+            <p class="stat-label">Employees</p>
+            <p class="stat-value" id="usersMetric">0</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Posts</p>
+            <p class="stat-value" id="postsMetric">0</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Comments</p>
+            <p class="stat-value" id="commentsMetric">0</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Selected User</p>
+            <p class="stat-value" id="selectedMetric">None</p>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel" id="usersPanel" aria-labelledby="usersTitle">
+            <div class="panel-head">
+              <h3 id="usersTitle">Employees</h3>
+            </div>
+            <div id="usersLoading" class="hidden">
+              <div class="skeleton"></div>
+              <div class="skeleton" style="margin-top: 0.65rem"></div>
+              <div class="skeleton" style="margin-top: 0.65rem"></div>
+            </div>
+            <div id="usersContainer" class="users-grid"></div>
+          </article>
+
+          <article class="panel" aria-labelledby="postsTitle">
+            <div class="panel-head">
+              <h3 id="postsTitle">Posts & Comments</h3>
+            </div>
+            <div id="postsLoading" class="hidden">
+              <div class="spinner" aria-hidden="true"></div>
+            </div>
+            <div id="postsContainer" class="posts-list">
+              <div class="empty">Select an employee to load posts.</div>
+            </div>
+          </article>
+        </section>
     </main>
+
+    <script>
+      /*
+        Architecture: Client-Side MVC in one file
+        - Model: API access and data entities (User, Post, Comment). Uses fetch + AbortController timeout + HTTP error handling.
+        - Controller: Application flow, state transitions, and event orchestration.
+        - View: Pure rendering utilities that receive data and update DOM output.
+      */
+
+      // =========================
+      // Model
+      // =========================
+      const API_BASE = "https://jsonplaceholder.typicode.com";
+      const REQUEST_TIMEOUT_MS = 8000;
+      const DISPLAY_NAMES = [
+        "Ygor Gabriel",
+        "Francisco Vital",
+        "Henrique de Moraes",
+        "César Henrique",
+        "Amaury Nogueira",
+        "Marcos Vinicius",
+        "Ícaro",
+      ];
+
+      class User {
+        constructor({ id, name, email, company }) {
+          this.id = id;
+          this.name = name;
+          this.email = email;
+          this.company = company?.name || "No company";
+        }
+      }
+
+      class Post {
+        constructor({ id, userId, title, body }) {
+          this.id = id;
+          this.userId = userId;
+          this.title = title;
+          this.body = body;
+        }
+      }
+
+      class Comment {
+        constructor({ id, postId, name, email, body }) {
+          this.id = id;
+          this.postId = postId;
+          this.name = name;
+          this.email = email;
+          this.body = body;
+        }
+      }
+
+      function buildError(status, endpoint) {
+        const err = new Error("Request failed");
+        err.status = status;
+        err.endpoint = endpoint;
+        return err;
+      }
+
+      async function fetchWithTimeout(endpoint) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+        try {
+          const response = await fetch(`${API_BASE}${endpoint}`, {
+            method: "GET",
+            signal: controller.signal,
+          });
+
+          if (!response.ok) {
+            throw buildError(response.status, endpoint);
+          }
+
+          return await response.json();
+        } catch (error) {
+          if (error.name === "AbortError") {
+            const timeoutError = new Error("timeout");
+            timeoutError.code = "TIMEOUT";
+            throw timeoutError;
+          }
+
+          if (error instanceof TypeError) {
+            const unavailableError = new Error("unavailable");
+            unavailableError.code = "UNAVAILABLE";
+            throw unavailableError;
+          }
+
+          throw error;
+        } finally {
+          clearTimeout(timeoutId);
+        }
+      }
+
+      async function getUsers() {
+        try {
+          const data = await fetchWithTimeout("/users");
+          return data.map((item, index) => {
+            const name = DISPLAY_NAMES[index] || item.name;
+            return new User({ ...item, name });
+          });
+        } catch (error) {
+          throw error;
+        }
+      }
+
+      async function getPostsByUser(userId) {
+        try {
+          const data = await fetchWithTimeout(`/posts?userId=${userId}`);
+          return data.map((item) => new Post(item));
+        } catch (error) {
+          throw error;
+        }
+      }
+
+      async function getCommentsByPost(postId) {
+        try {
+          const data = await fetchWithTimeout(`/comments?postId=${postId}`);
+          return data.map((item) => new Comment(item));
+        } catch (error) {
+          throw error;
+        }
+      }
+
+      // =========================
+      // View
+      // =========================
+      const dom = {
+        usersContainer: document.getElementById("usersContainer"),
+        postsContainer: document.getElementById("postsContainer"),
+        usersLoading: document.getElementById("usersLoading"),
+        postsLoading: document.getElementById("postsLoading"),
+        errorBanner: document.getElementById("errorBanner"),
+        searchInput: document.getElementById("searchInput"),
+        usersMetric: document.getElementById("usersMetric"),
+        postsMetric: document.getElementById("postsMetric"),
+        commentsMetric: document.getElementById("commentsMetric"),
+        selectedMetric: document.getElementById("selectedMetric"),
+      };
+
+      function showError(message) {
+        dom.errorBanner.textContent = message;
+        dom.errorBanner.classList.add("show");
+      }
+
+      function hideError() {
+        dom.errorBanner.classList.remove("show");
+        dom.errorBanner.textContent = "";
+      }
+
+      function showUsersLoading(isLoading) {
+        dom.usersLoading.classList.toggle("hidden", !isLoading);
+      }
+
+      function showPostsLoading(isLoading) {
+        dom.postsLoading.classList.toggle("hidden", !isLoading);
+      }
+
+      function updateMetrics() {
+        const selectedUser = state.users.find((user) => user.id === state.selectedUserId);
+        const commentsLoadedCount = Object.values(state.commentsByPostId).reduce(
+          (acc, comments) => acc + comments.length,
+          0
+        );
+
+        dom.usersMetric.textContent = String(state.users.length);
+        dom.postsMetric.textContent = String(state.posts.length);
+        dom.commentsMetric.textContent = String(commentsLoadedCount);
+        dom.selectedMetric.textContent = selectedUser ? selectedUser.name.split(" ")[0] : "None";
+      }
+
+      function getUserInitials(name) {
+        return name
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) => part[0]?.toUpperCase() || "")
+          .join("");
+      }
+
+      function renderUsers(users, selectedUserId) {
+        if (!users.length) {
+          dom.usersContainer.innerHTML = '<div class="empty">No employees match your search.</div>';
+          return;
+        }
+
+        dom.usersContainer.innerHTML = users
+          .map(
+            (user) => `
+              <button type="button" class="user-card ${selectedUserId === user.id ? "active" : ""}" data-user-id="${user.id}">
+                <div class="user-head">
+                  <div class="user-avatar" aria-hidden="true">${getUserInitials(user.name)}</div>
+                  <h4>${user.name}</h4>
+                </div>
+                <p class="user-meta">${user.email}</p>
+                <p class="user-meta">${user.company}</p>
+              </button>
+            `
+          )
+          .join("");
+      }
+
+      function renderPosts(posts, openPostId) {
+        if (!posts.length) {
+          dom.postsContainer.innerHTML = '<div class="empty">No posts found for this user.</div>';
+          return;
+        }
+
+        dom.postsContainer.innerHTML = posts
+          .map(
+            (post) => `
+              <article class="post-card ${openPostId === post.id ? "open" : ""}" data-post-id="${post.id}">
+                <div class="post-header">
+                  <h4>${post.title}</h4>
+                  <span class="post-toggle">${openPostId === post.id ? "open" : "closed"}</span>
+                </div>
+                <p>${post.body}</p>
+                <div class="comments-wrap ${openPostId === post.id ? "open" : ""}" id="comments-${post.id}"></div>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function renderComments(postId, comments) {
+        const target = document.getElementById(`comments-${postId}`);
+        if (!target) return;
+
+        if (!comments.length) {
+          target.innerHTML = '<div class="empty">No comments available.</div>';
+          return;
+        }
+
+        target.innerHTML = `
+          <div class="comments-list">
+            ${comments
+              .map(
+                (comment) => `
+                  <div class="comment">
+                    <strong>${comment.name}</strong>
+                    <br />
+                    <small>${comment.email}</small>
+                    <p>${comment.body}</p>
+                  </div>
+                `
+              )
+              .join("")}
+          </div>
+        `;
+      }
+
+      function renderCommentsLoading(postId) {
+        const target = document.getElementById(`comments-${postId}`);
+        if (!target) return;
+        target.innerHTML = '<div class="spinner" aria-hidden="true"></div>';
+      }
+
+      // =========================
+      // Controller
+      // =========================
+      const state = {
+        users: [],
+        visibleUsers: [],
+        posts: [],
+        commentsByPostId: {},
+        selectedUserId: null,
+        openPostId: null,
+        searchQuery: "",
+      };
+
+      function applyUsersFilter() {
+        const normalizedQuery = state.searchQuery.trim().toLowerCase();
+        state.visibleUsers = state.users.filter((user) => {
+          const matchesQuery =
+            !normalizedQuery ||
+            user.name.toLowerCase().includes(normalizedQuery) ||
+            user.email.toLowerCase().includes(normalizedQuery);
+          return matchesQuery;
+        });
+      }
+
+      function mapErrorToMessage(error) {
+        if (error?.code === "TIMEOUT") {
+          return "Request timeout exceeded (8 seconds). Please try again.";
+        }
+
+        if (error?.code === "UNAVAILABLE") {
+          return "API unavailable. Check your internet connection and try again.";
+        }
+
+        if (error?.status === 404) {
+          return "Requested resource was not found (404).";
+        }
+
+        if (error?.status >= 500) {
+          return "The server encountered an error (5xx). Please retry shortly.";
+        }
+
+        return "Unexpected error while loading data.";
+      }
+
+      async function loadUsers() {
+        hideError();
+        showUsersLoading(true);
+
+        try {
+          state.users = await getUsers();
+          applyUsersFilter();
+          renderUsers(state.visibleUsers, state.selectedUserId);
+          updateMetrics();
+        } catch (error) {
+          showError(mapErrorToMessage(error));
+        } finally {
+          showUsersLoading(false);
+        }
+      }
+
+      async function loadPostsForUser(userId) {
+        hideError();
+        showPostsLoading(true);
+
+        try {
+          state.selectedUserId = userId;
+          state.openPostId = null;
+          state.commentsByPostId = {};
+          state.posts = [];
+          renderUsers(state.visibleUsers, state.selectedUserId);
+          renderPosts(state.posts, state.openPostId);
+          updateMetrics();
+
+          state.posts = await getPostsByUser(userId);
+          renderPosts(state.posts, state.openPostId);
+          updateMetrics();
+        } catch (error) {
+          showError(mapErrorToMessage(error));
+        } finally {
+          showPostsLoading(false);
+        }
+      }
+
+      async function togglePostComments(postId) {
+        hideError();
+
+        if (state.openPostId === postId) {
+          state.openPostId = null;
+          renderPosts(state.posts, state.openPostId);
+          updateMetrics();
+          return;
+        }
+
+        state.openPostId = postId;
+        renderPosts(state.posts, state.openPostId);
+
+        if (state.commentsByPostId[postId]) {
+          renderComments(postId, state.commentsByPostId[postId]);
+          updateMetrics();
+          return;
+        }
+
+        renderCommentsLoading(postId);
+
+        try {
+          const comments = await getCommentsByPost(postId);
+          state.commentsByPostId[postId] = comments;
+          if (state.openPostId === postId) {
+            renderComments(postId, comments);
+          }
+          updateMetrics();
+        } catch (error) {
+          showError(mapErrorToMessage(error));
+        }
+      }
+
+      function bindEvents() {
+        dom.usersContainer.addEventListener("click", (event) => {
+          const card = event.target.closest("[data-user-id]");
+          if (!card) return;
+
+          const userId = Number(card.dataset.userId);
+          if (!Number.isFinite(userId)) return;
+          loadPostsForUser(userId);
+        });
+
+        dom.postsContainer.addEventListener("click", (event) => {
+          if (event.target.closest(".comments-wrap")) return;
+
+          const card = event.target.closest(".post-card[data-post-id]");
+          if (!card) return;
+
+          const postId = Number(card.dataset.postId);
+          if (!Number.isFinite(postId)) return;
+          togglePostComments(postId);
+        });
+
+        dom.searchInput.addEventListener("input", (event) => {
+          state.searchQuery = event.target.value;
+          applyUsersFilter();
+          renderUsers(state.visibleUsers, state.selectedUserId);
+          updateMetrics();
+        });
+      }
+
+      async function init() {
+        bindEvents();
+        await loadUsers();
+      }
+
+      init();
+    </script>
   </body>
 </html>
