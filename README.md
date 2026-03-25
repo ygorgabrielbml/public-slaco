@@ -1,65 +1,62 @@
-# Dashboard de Comunicação Interna (Protótipo)
+# Dashboard de Comunicacao Interna
 
-## 1. O que é este projeto
-Este projeto é um protótipo de **Dashboard de Comunicação Interna** para uma startup, desenvolvido para validar rapidamente a ideia do produto sem construir um back-end próprio.
+## 1. Visao geral
+Este projeto e um prototipo de um Dashboard de Comunicacao Interna para centralizar:
+- perfis de colaboradores
+- postagens
+- comentarios
 
-A aplicação consome dados reais da API pública **JSONPlaceholder** e exibe:
-- lista de usuários (colaboradores)
-- postagens de cada usuário
-- comentários de cada postagem
+O objetivo e validar rapidamente a ideia do produto com arquitetura Cliente-Servidor, consumindo a API REST publica `JSONPlaceholder` em vez de construir um back-end proprio nesta etapa.
 
-Tudo foi implementado em um único arquivo `index.html` com arquitetura **Cliente-Servidor** no front-end, organizada em **MVC (Model-View-Controller)**.
+## 2. Escopo da atividade
+O prototipo atende ao fluxo principal pedido no exercicio:
+- listar usuarios
+- selecionar um usuario
+- carregar postagens relacionadas
+- abrir comentarios de uma postagem
+- exibir loading, tratamento de falhas e mensagens de erro
 
-## 2. Contexto da atividade (faculdade)
-A proposta da disciplina é simular um pré-projeto de Engenharia de Software, incluindo:
-- levantamento de requisitos
-- modelagem estrutural (UML)
-- definição arquitetural
-- tratamento de falhas de integração
-- prototipagem rápida
-- pitch defendendo viabilidade e riscos
+## 3. User Stories
+1. Como funcionario, quero ver a lista de colaboradores para identificar rapidamente quem participa da plataforma.
+2. Como funcionario, quero selecionar um colaborador e visualizar suas postagens para acompanhar atualizacoes internas.
+3. Como funcionario, quero expandir uma postagem e ler os comentarios para entender o contexto da conversa.
+4. Como usuario, quero feedback visual de carregamento para saber que o sistema esta buscando dados.
+5. Como usuario, quero mensagens claras de erro quando a API estiver lenta, indisponivel ou retornar dados inconsistentes.
 
-Este repositório cobre esses pontos com foco em validação técnica e visual.
+## 4. Requisitos nao funcionais
+- Resiliencia de rede com timeout de 8 segundos por requisicao.
+- Retry automatico para falhas transientes de timeout ou indisponibilidade.
+- Tratamento de excecoes para falhas HTTP e falhas de rede.
+- Validacao do contrato JSON antes de renderizar dados na interface.
+- Interface responsiva para desktop e mobile.
+- Feedback visual de loading e erro sem travar a aplicacao.
 
-## 3. Tecnologias e recursos utilizados
-- **HTML5**
-- **CSS3** (tema escuro, layout responsivo com Grid/Flex, microinterações)
-- **JavaScript (ES6+)**
-- **Fetch API** para requisições HTTP `GET`
-- **AbortController** para timeout de 8 segundos
-- **JSONPlaceholder** (API REST fake para testes)
-- **Google Fonts** (`Manrope` e `Space Grotesk`)
-
-## 4. Endpoints consumidos
+## 5. Endpoints consumidos
 - `GET https://jsonplaceholder.typicode.com/users`
 - `GET https://jsonplaceholder.typicode.com/posts?userId={id}`
 - `GET https://jsonplaceholder.typicode.com/comments?postId={id}`
 
-## 5. Histórias de Usuário (User Stories)
-1. Como funcionário, quero ver a lista de colaboradores com dados básicos para identificar rapidamente quem está na plataforma.
-2. Como funcionário, quero selecionar um colaborador e visualizar suas postagens para acompanhar atualizações internas.
-3. Como funcionário, quero expandir uma postagem e ler seus comentários para entender o contexto das discussões.
-4. Como usuário, quero feedback visual de carregamento para saber que o sistema está buscando dados.
-5. Como usuário, quero mensagens claras de erro (timeout, API indisponível, 404) para entender quando houver falha de comunicação.
+## 6. Arquitetura aplicada
+### Cliente-Servidor
+- Cliente: navegador executando a interface, o estado da aplicacao e a logica de consumo da API.
+- Servidor: JSONPlaceholder fornecendo recursos REST em JSON.
 
-## 6. Requisitos não funcionais e restrições
-- **Resiliência de rede:** timeout de 8s por requisição.
-- **Tratamento de exceções:** `try/catch` em todas as chamadas.
-- **Tratamento HTTP:** mensagens específicas para `404` e erros `5xx`.
-- **UX mínima de confiabilidade:** estado de loading e erro visível na interface.
-- **Responsividade:** interface adaptada para desktop e mobile.
+### MVC no cliente
+- Model: classes `User`, `Post` e `Comment`, mais os adaptadores `fromApi()` para validar o contrato da API.
+- View: funcoes de renderizacao, loading, metricas, mensagens e painel de comentarios.
+- Controller: orquestracao do estado, eventos, fluxo de selecao, abertura de comentarios e tratamento de falhas.
 
-## 7. Modelagem estrutural (UML)
-Classes principais no cliente:
+## 7. Modelagem estrutural
+### Classes principais
 - `User { id, name, email, company }`
 - `Post { id, userId, title, body }`
 - `Comment { id, postId, name, email, body }`
 
-Relações de multiplicidade:
-- `User 1:* Post`
-- `Post 1:* Comment`
+### Relacoes
+- `User 1..* Post`
+- `Post 1..* Comment`
 
-### Diagrama de Classes (Mermaid)
+### Diagrama de classes UML
 ```mermaid
 classDiagram
   class User {
@@ -67,6 +64,9 @@ classDiagram
     +name: string
     +email: string
     +company: string
+    +fromApi(raw, preferredName, endpoint) User
+    +get initials() string
+    +get shortName() string
   }
 
   class Post {
@@ -74,6 +74,7 @@ classDiagram
     +userId: number
     +title: string
     +body: string
+    +fromApi(raw, endpoint) Post
   }
 
   class Comment {
@@ -82,63 +83,69 @@ classDiagram
     +name: string
     +email: string
     +body: string
+    +fromApi(raw, endpoint) Comment
   }
 
-  User "1" --> "*" Post : cria/publica
+  class Controller {
+    +loadUsers()
+    +loadPostsForUser(userId)
+    +togglePostComments(postId)
+    +refreshCurrentView()
+  }
+
+  class View {
+    +renderUsers(users, selectedUserId)
+    +renderPosts(posts, openPostId)
+    +renderComments(postId, comments)
+    +updateMetrics()
+  }
+
+  User "1" --> "*" Post : publica
   Post "1" --> "*" Comment : recebe
+  Controller --> View : atualiza
+  Controller --> User : usa
+  Controller --> Post : usa
+  Controller --> Comment : usa
 ```
 
-## 8. Arquitetura aplicada
-### Cliente-Servidor
-- **Cliente (browser):** interface, lógica de interação e consumo da API.
-- **Servidor externo:** JSONPlaceholder fornece recursos REST em JSON.
+## 8. Estrategias de resiliencia e riscos
+### Falhas de rede
+- Timeout com `AbortController` impede a aplicacao de ficar aguardando indefinidamente.
+- Retry automatico reduz impacto de oscilacoes momentaneas.
+- Erros `404` e `5xx` sao transformados em mensagens legiveis para o usuario.
 
-### MVC no front-end
-- **Model:** funções assíncronas que chamam API (`fetch`) + classes de domínio (`User`, `Post`, `Comment`).
-- **View:** funções puras de renderização e manipulação do DOM.
-- **Controller:** orquestra fluxo, eventos de clique, estado global e tratamento de erros.
+### Mudanca de contrato da API
+- O cliente valida se a resposta e um array quando espera colecoes.
+- Os adaptadores `fromApi()` validam campos essenciais como `id`, `userId` e `postId`.
+- Se a estrutura vier invalida, a interface bloqueia a renderizacao e mostra um erro de contrato, em vez de exibir dados corrompidos.
 
-## 9. Estratégias de mitigação de falhas (gerenciamento de riscos)
-- **Timeout (8s):** evita travamento quando a API demora.
-- **API indisponível:** captura erro de rede e mostra aviso amigável.
-- **Erro 404:** retorno de “recurso não encontrado”.
-- **Erro 5xx:** retorno de “falha interna do servidor”.
-- **Fallback visual:** loading + banner de erro para preservar a experiência do usuário.
+### UX de protecao
+- Estados de loading deixam claro que a aplicacao esta processando dados.
+- Banner de erro evita falha silenciosa.
+- O painel de comentarios abre em sobreposicao e se reposiciona para manter legibilidade.
 
-## 10. Funcionalidades implementadas no protótipo
-- Listagem de usuários em cards.
-- Clique no usuário para carregar postagens relacionadas.
-- Clique na postagem para expandir/ocultar comentários.
-- Sidebar lateral e visual de dashboard corporativo.
-- Layout responsivo com múltiplas colunas no desktop.
-- Microinterações (hover, transições de expansão).
+## 9. Funcionalidades implementadas
+- Busca de usuarios por nome, email ou empresa.
+- Selecao de usuario com atualizacao de metricas.
+- Carregamento de posts por usuario.
+- Abertura de comentarios por post.
+- Cache em memoria para comentarios ja carregados.
+- Botao de refresh para recarregar os dados.
+- Fechamento do painel de comentarios com `Esc`.
 
-## 11. Como executar
-1. Baixe/clone o repositório.
-2. Abra o arquivo `index.html` no navegador.
-3. Necessário internet para carregar:
+## 10. Como executar
+1. Abra o arquivo `index.html` no navegador.
+2. Garanta conexao com a internet para acessar:
 - Google Fonts
-- API JSONPlaceholder
+- JSONPlaceholder
 
-## 12. Roteiro rápido para o Pitch (10-15 min)
-1. **Visão do Produto:** centralizar comunicação interna (usuários, posts e comentários) em uma única interface.
-2. **Viabilidade:** uso de API REST pública reduziu custo e tempo de desenvolvimento inicial.
-3. **Arquitetura:** cliente-servidor + MVC separando dados, visual e controle.
-4. **Riscos e respostas:** timeout, tratamento de exceções, mensagens de erro e camada de adaptação no cliente.
+## 11. Pitch resumido
+- Valor do produto: centraliza comunicacao interna em uma unica interface simples.
+- Viabilidade: reduz custo inicial ao reutilizar uma API REST publica durante a validacao do conceito.
+- Arquitetura: Cliente-Servidor com MVC no cliente para separar integracao, apresentacao e fluxo.
+- Riscos: timeout, indisponibilidade, erro HTTP e mudanca de contrato mitigados no cliente.
 
-## 13. PRD / Prompt utilizado (para apresentar na disciplina)
-```text
-Desenvolver um protótipo de Dashboard de Comunicação Interna em um único index.html,
-consumindo JSONPlaceholder (/users, /posts, /comments) via fetch GET. Organizar o código
-em MVC no cliente: Model (requisições com try/catch, timeout de 8s com AbortController e
-tratamento de HTTP 404/500), Controller (orquestração e estado) e View (renderização pura
-no DOM). Funcionalidades: listar usuários, carregar posts por usuário, expandir comentários
-por post, loading e erros visíveis. Design: tema escuro, sidebar corporativa, responsivo,
-microinterações e tipografia moderna via Google Fonts.
-```
-
-## 14. Entregáveis da atividade
-- [x] Código-fonte do protótipo integrado ao JSONPlaceholder (este repositório)
-- [ ] Slides de apresentação do Pitch
-- [x] PRD/Prompt utilizado para orientar o desenvolvimento
-
+## 12. Entregaveis
+- [x] Prototipo funcional integrado ao JSONPlaceholder
+- [x] Documentacao de requisitos, arquitetura e UML
+- [x] Material-base para apresentacao do pitch

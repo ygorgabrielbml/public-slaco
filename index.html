@@ -81,6 +81,25 @@
         justify-content: flex-end;
       }
 
+      .toolbar-button {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: linear-gradient(180deg, #171717 0%, #101010 100%);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.88rem;
+        padding: 0.62rem 0.9rem;
+        cursor: pointer;
+        transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .toolbar-button:hover,
+      .toolbar-button:focus-visible {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+      }
+
       .main {
         max-width: 1400px;
         margin: 0 auto;
@@ -186,7 +205,7 @@
 
       .content-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
+        grid-template-columns: minmax(280px, 0.95fr) minmax(0, 2.05fr);
         gap: 1rem;
         min-height: 0;
       }
@@ -219,6 +238,12 @@
 
       .panel .panel-head h3 {
         margin: 0;
+      }
+
+      .panel-caption {
+        margin: 0.2rem 0 0;
+        color: var(--text-soft);
+        font-size: 0.84rem;
       }
 
       .users-grid {
@@ -326,17 +351,24 @@
         white-space: nowrap;
       }
 
-      .posts-list,
-      .comments-list {
-        display: grid;
-        gap: 0.78rem;
-      }
-
       .posts-list {
         flex: 1;
         min-height: 0;
         overflow: auto;
-        padding-right: 0.2rem;
+        padding-right: 0.35rem;
+        padding-bottom: 18rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        align-items: stretch;
+        position: relative;
+        isolation: isolate;
+      }
+
+      .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.78rem;
       }
 
       .posts-list::-webkit-scrollbar {
@@ -352,30 +384,37 @@
         border: 1px solid var(--line);
         border-radius: var(--radius-sm);
         background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
-        padding: 0.95rem;
-        min-height: 0;
+        padding: 1rem 1.05rem 1.15rem;
+        min-height: 140px;
         cursor: pointer;
-        transition: border-color 0.25s ease, transform 0.25s ease;
+        position: relative;
+        overflow: visible;
+        z-index: 1;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
       }
 
       .post-card:hover {
-        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
       }
 
       .post-card.open {
         border-color: var(--accent);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+        z-index: 20;
       }
 
       .post-header {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
         align-items: start;
         gap: 0.8rem;
       }
 
-      .post-header h4 {
+      .post-title {
         margin: 0;
         font-size: 1rem;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
       }
 
       .post-toggle {
@@ -385,51 +424,82 @@
         color: var(--text-soft);
         padding: 0.2rem 0.5rem;
         font-size: 0.74rem;
+        flex-shrink: 0;
       }
 
-      .post-card p {
+      .post-body {
         color: var(--text-soft);
-        margin: 0.6rem 0 0;
+        margin: 0.1rem 0 0;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+        display: block;
       }
 
       .comments-wrap {
-        margin-top: 0.7rem;
+        position: absolute;
+        left: 0.9rem;
+        right: 0.9rem;
+        top: calc(100% - 0.45rem);
         background: #151515;
-        border: 1px solid transparent;
-        border-radius: 10px;
+        border: 1px solid rgba(20, 200, 173, 0.2);
+        border-radius: 14px;
         overflow: hidden;
         max-height: 0;
         opacity: 0;
         pointer-events: none;
-        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.2s ease;
+        padding: 0 0.95rem;
+        box-shadow: 0 22px 40px rgba(0, 0, 0, 0.38);
+        z-index: 30;
+        transition: max-height 0.28s ease, opacity 0.2s ease, padding 0.2s ease, transform 0.2s ease;
+        transform: translateY(-6px);
       }
 
       .comments-wrap.open {
-        max-height: 170px;
+        max-height: 45vh;
         opacity: 1;
-        padding: 0.55rem 0.65rem;
+        padding: 0.9rem 0.95rem;
         overflow: auto;
         border-color: var(--line-soft);
         pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .comments-wrap.upward {
+        top: auto;
+        bottom: calc(100% - 0.45rem);
       }
 
       .comment {
         border-top: 1px solid var(--line-soft);
-        padding-top: 0.62rem;
+        padding-top: 0.75rem;
+        display: grid;
+        gap: 0.28rem;
+      }
+
+      .comment:first-child {
+        border-top: 0;
+        padding-top: 0;
       }
 
       .comment strong {
         font-size: 0.88rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
       }
 
       .comment small {
         color: var(--text-soft);
+        display: block;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
       }
 
       .comment p {
-        margin: 0.3rem 0 0;
+        margin: 0.1rem 0 0;
         color: var(--text-soft);
         font-size: 0.9rem;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
       }
 
       .empty {
@@ -533,6 +603,7 @@
       <div class="topbar-row">
         <div class="brand"><h1>Slaco</h1></div>
         <div class="toolbar">
+          <button class="toolbar-button" id="refreshButton" type="button">Refresh data</button>
           <input
             class="search-input"
             id="searchInput"
@@ -576,7 +647,10 @@
         <section class="content-grid">
           <article class="panel" id="usersPanel" aria-labelledby="usersTitle">
             <div class="panel-head">
-              <h3 id="usersTitle">Employees</h3>
+              <div>
+                <h3 id="usersTitle">Employees</h3>
+                <p class="panel-caption">Search and select a teammate to inspect activity.</p>
+              </div>
             </div>
             <div id="usersLoading" class="hidden">
               <div class="skeleton"></div>
@@ -588,7 +662,10 @@
 
           <article class="panel" aria-labelledby="postsTitle">
             <div class="panel-head">
-              <h3 id="postsTitle">Posts & Comments</h3>
+              <div>
+                <h3 id="postsTitle">Posts & Comments</h3>
+                <p class="panel-caption" id="postsCaption">Select an employee to inspect posts and comments.</p>
+              </div>
             </div>
             <div id="postsLoading" class="hidden">
               <div class="spinner" aria-hidden="true"></div>
@@ -613,6 +690,8 @@
       // =========================
       const API_BASE = "https://jsonplaceholder.typicode.com";
       const REQUEST_TIMEOUT_MS = 8000;
+      const MAX_RETRIES = 1;
+      const OVERLAY_COMFORT_SPACE = 340;
       const DISPLAY_NAMES = [
         "Ygor Gabriel",
         "Francisco Vital",
@@ -623,12 +702,47 @@
         "Ícaro",
       ];
 
+      class ApiContractError extends Error {
+        constructor(message, endpoint) {
+          super(message);
+          this.name = "ApiContractError";
+          this.code = "CONTRACT";
+          this.endpoint = endpoint;
+        }
+      }
+
       class User {
         constructor({ id, name, email, company }) {
           this.id = id;
           this.name = name;
           this.email = email;
           this.company = company?.name || "No company";
+        }
+
+        static fromApi(raw, preferredName, endpoint) {
+          if (!isRecord(raw)) {
+            throw new ApiContractError("User payload is not an object.", endpoint);
+          }
+
+          return new User({
+            id: parseRequiredNumber(raw.id, "user.id", endpoint),
+            name: normalizeText(preferredName || raw.name, "Unnamed user"),
+            email: normalizeText(raw.email, "No email available"),
+            company: { name: normalizeText(raw.company?.name, "No company") },
+          });
+        }
+
+        get initials() {
+          return this.name
+            .split(" ")
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0]?.toUpperCase() || "")
+            .join("");
+        }
+
+        get shortName() {
+          return this.name.split(" ")[0] || "None";
         }
       }
 
@@ -638,6 +752,19 @@
           this.userId = userId;
           this.title = title;
           this.body = body;
+        }
+
+        static fromApi(raw, endpoint) {
+          if (!isRecord(raw)) {
+            throw new ApiContractError("Post payload is not an object.", endpoint);
+          }
+
+          return new Post({
+            id: parseRequiredNumber(raw.id, "post.id", endpoint),
+            userId: parseRequiredNumber(raw.userId, "post.userId", endpoint),
+            title: normalizeText(raw.title, "Untitled post"),
+            body: normalizeText(raw.body, "No content available for this post."),
+          });
         }
       }
 
@@ -649,6 +776,20 @@
           this.email = email;
           this.body = body;
         }
+
+        static fromApi(raw, endpoint) {
+          if (!isRecord(raw)) {
+            throw new ApiContractError("Comment payload is not an object.", endpoint);
+          }
+
+          return new Comment({
+            id: parseRequiredNumber(raw.id, "comment.id", endpoint),
+            postId: parseRequiredNumber(raw.postId, "comment.postId", endpoint),
+            name: normalizeText(raw.name, "Anonymous comment"),
+            email: normalizeText(raw.email, "Email unavailable"),
+            body: normalizeText(raw.body, "No comment body provided."),
+          });
+        }
       }
 
       function buildError(status, endpoint) {
@@ -658,68 +799,107 @@
         return err;
       }
 
+      function isRecord(value) {
+        return value !== null && typeof value === "object" && !Array.isArray(value);
+      }
+
+      function parseRequiredNumber(value, fieldName, endpoint) {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+          throw new ApiContractError(`Expected numeric field "${fieldName}".`, endpoint);
+        }
+
+        return numericValue;
+      }
+
+      function normalizeText(value, fallback = "") {
+        return String(value ?? fallback)
+          .replace(/\s+/g, " ")
+          .trim() || fallback;
+      }
+
+      function ensureArrayPayload(payload, endpoint) {
+        if (!Array.isArray(payload)) {
+          throw new ApiContractError("Expected an array response from the API.", endpoint);
+        }
+      }
+
+      function normalizeRequestError(error, endpoint) {
+        if (error instanceof ApiContractError) {
+          return error;
+        }
+
+        if (error?.name === "AbortError") {
+          const timeoutError = new Error("timeout");
+          timeoutError.code = "TIMEOUT";
+          timeoutError.endpoint = endpoint;
+          return timeoutError;
+        }
+
+        if (error instanceof TypeError) {
+          const unavailableError = new Error("unavailable");
+          unavailableError.code = "UNAVAILABLE";
+          unavailableError.endpoint = endpoint;
+          return unavailableError;
+        }
+
+        if (!error?.endpoint) {
+          error.endpoint = endpoint;
+        }
+
+        return error;
+      }
+
       async function fetchWithTimeout(endpoint) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-        try {
-          const response = await fetch(`${API_BASE}${endpoint}`, {
-            method: "GET",
-            signal: controller.signal,
-          });
+          try {
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+              method: "GET",
+              signal: controller.signal,
+            });
 
-          if (!response.ok) {
-            throw buildError(response.status, endpoint);
+            if (!response.ok) {
+              throw buildError(response.status, endpoint);
+            }
+
+            return await response.json();
+          } catch (error) {
+            const normalizedError = normalizeRequestError(error, endpoint);
+            const shouldRetry =
+              attempt < MAX_RETRIES &&
+              (normalizedError.code === "TIMEOUT" || normalizedError.code === "UNAVAILABLE");
+
+            if (!shouldRetry) {
+              throw normalizedError;
+            }
+          } finally {
+            clearTimeout(timeoutId);
           }
-
-          return await response.json();
-        } catch (error) {
-          if (error.name === "AbortError") {
-            const timeoutError = new Error("timeout");
-            timeoutError.code = "TIMEOUT";
-            throw timeoutError;
-          }
-
-          if (error instanceof TypeError) {
-            const unavailableError = new Error("unavailable");
-            unavailableError.code = "UNAVAILABLE";
-            throw unavailableError;
-          }
-
-          throw error;
-        } finally {
-          clearTimeout(timeoutId);
         }
       }
 
       async function getUsers() {
-        try {
-          const data = await fetchWithTimeout("/users");
-          return data.map((item, index) => {
-            const name = DISPLAY_NAMES[index] || item.name;
-            return new User({ ...item, name });
-          });
-        } catch (error) {
-          throw error;
-        }
+        const endpoint = "/users";
+        const data = await fetchWithTimeout(endpoint);
+        ensureArrayPayload(data, endpoint);
+        return data.map((item, index) => User.fromApi(item, DISPLAY_NAMES[index] || item?.name, endpoint));
       }
 
       async function getPostsByUser(userId) {
-        try {
-          const data = await fetchWithTimeout(`/posts?userId=${userId}`);
-          return data.map((item) => new Post(item));
-        } catch (error) {
-          throw error;
-        }
+        const endpoint = `/posts?userId=${userId}`;
+        const data = await fetchWithTimeout(endpoint);
+        ensureArrayPayload(data, endpoint);
+        return data.map((item) => Post.fromApi(item, endpoint));
       }
 
       async function getCommentsByPost(postId) {
-        try {
-          const data = await fetchWithTimeout(`/comments?postId=${postId}`);
-          return data.map((item) => new Comment(item));
-        } catch (error) {
-          throw error;
-        }
+        const endpoint = `/comments?postId=${postId}`;
+        const data = await fetchWithTimeout(endpoint);
+        ensureArrayPayload(data, endpoint);
+        return data.map((item) => Comment.fromApi(item, endpoint));
       }
 
       // =========================
@@ -732,11 +912,22 @@
         postsLoading: document.getElementById("postsLoading"),
         errorBanner: document.getElementById("errorBanner"),
         searchInput: document.getElementById("searchInput"),
+        refreshButton: document.getElementById("refreshButton"),
+        postsCaption: document.getElementById("postsCaption"),
         usersMetric: document.getElementById("usersMetric"),
         postsMetric: document.getElementById("postsMetric"),
         commentsMetric: document.getElementById("commentsMetric"),
         selectedMetric: document.getElementById("selectedMetric"),
       };
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
 
       function showError(message) {
         dom.errorBanner.textContent = message;
@@ -756,6 +947,11 @@
         dom.postsLoading.classList.toggle("hidden", !isLoading);
       }
 
+      function setRefreshState(isLoading) {
+        dom.refreshButton.disabled = isLoading;
+        dom.refreshButton.textContent = isLoading ? "Refreshing..." : "Refresh data";
+      }
+
       function updateMetrics() {
         const selectedUser = state.users.find((user) => user.id === state.selectedUserId);
         const commentsLoadedCount = Object.values(state.commentsByPostId).reduce(
@@ -766,16 +962,41 @@
         dom.usersMetric.textContent = String(state.users.length);
         dom.postsMetric.textContent = String(state.posts.length);
         dom.commentsMetric.textContent = String(commentsLoadedCount);
-        dom.selectedMetric.textContent = selectedUser ? selectedUser.name.split(" ")[0] : "None";
+        dom.selectedMetric.textContent = selectedUser ? selectedUser.shortName : "None";
       }
 
-      function getUserInitials(name) {
-        return name
-          .split(" ")
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((part) => part[0]?.toUpperCase() || "")
-          .join("");
+      function renderPostsCaption() {
+        const selectedUser = state.users.find((user) => user.id === state.selectedUserId);
+        const commentsLoadedCount = Object.values(state.commentsByPostId).reduce(
+          (acc, comments) => acc + comments.length,
+          0
+        );
+
+        if (!selectedUser) {
+          dom.postsCaption.textContent = "Select an employee to inspect posts and comments.";
+          return;
+        }
+
+        dom.postsCaption.textContent = `${selectedUser.name} · ${state.posts.length} posts · ${commentsLoadedCount} loaded comments`;
+      }
+
+      function syncOpenCommentsPanel() {
+        if (!state.openPostId) return;
+
+        const panel = document.getElementById(`comments-${state.openPostId}`);
+        const card = panel?.closest(".post-card");
+        if (!panel || !card) return;
+
+        panel.classList.remove("upward");
+
+        const listRect = dom.postsContainer.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const spaceBelow = listRect.bottom - cardRect.bottom;
+        const spaceAbove = cardRect.top - listRect.top;
+
+        if (spaceBelow < OVERLAY_COMFORT_SPACE && spaceAbove > spaceBelow) {
+          panel.classList.add("upward");
+        }
       }
 
       function renderUsers(users, selectedUserId) {
@@ -789,11 +1010,11 @@
             (user) => `
               <button type="button" class="user-card ${selectedUserId === user.id ? "active" : ""}" data-user-id="${user.id}">
                 <div class="user-head">
-                  <div class="user-avatar" aria-hidden="true">${getUserInitials(user.name)}</div>
-                  <h4>${user.name}</h4>
+                  <div class="user-avatar" aria-hidden="true">${escapeHtml(user.initials)}</div>
+                  <h4>${escapeHtml(user.name)}</h4>
                 </div>
-                <p class="user-meta">${user.email}</p>
-                <p class="user-meta">${user.company}</p>
+                <p class="user-meta">${escapeHtml(user.email)}</p>
+                <p class="user-meta">${escapeHtml(user.company)}</p>
               </button>
             `
           )
@@ -801,6 +1022,11 @@
       }
 
       function renderPosts(posts, openPostId) {
+        if (!state.selectedUserId) {
+          dom.postsContainer.innerHTML = '<div class="empty">Select an employee to load posts.</div>';
+          return;
+        }
+
         if (!posts.length) {
           dom.postsContainer.innerHTML = '<div class="empty">No posts found for this user.</div>';
           return;
@@ -811,10 +1037,10 @@
             (post) => `
               <article class="post-card ${openPostId === post.id ? "open" : ""}" data-post-id="${post.id}">
                 <div class="post-header">
-                  <h4>${post.title}</h4>
+                  <h4 class="post-title">${escapeHtml(post.title)}</h4>
                   <span class="post-toggle">${openPostId === post.id ? "open" : "closed"}</span>
                 </div>
-                <p>${post.body}</p>
+                <p class="post-body">${escapeHtml(post.body)}</p>
                 <div class="comments-wrap ${openPostId === post.id ? "open" : ""}" id="comments-${post.id}"></div>
               </article>
             `
@@ -837,10 +1063,9 @@
               .map(
                 (comment) => `
                   <div class="comment">
-                    <strong>${comment.name}</strong>
-                    <br />
-                    <small>${comment.email}</small>
-                    <p>${comment.body}</p>
+                    <strong>${escapeHtml(comment.name)}</strong>
+                    <small>${escapeHtml(comment.email)}</small>
+                    <p>${escapeHtml(comment.body)}</p>
                   </div>
                 `
               )
@@ -866,6 +1091,11 @@
         selectedUserId: null,
         openPostId: null,
         searchQuery: "",
+        requestIds: {
+          users: 0,
+          posts: 0,
+          comments: 0,
+        },
       };
 
       function applyUsersFilter() {
@@ -874,7 +1104,8 @@
           const matchesQuery =
             !normalizedQuery ||
             user.name.toLowerCase().includes(normalizedQuery) ||
-            user.email.toLowerCase().includes(normalizedQuery);
+            user.email.toLowerCase().includes(normalizedQuery) ||
+            user.company.toLowerCase().includes(normalizedQuery);
           return matchesQuery;
         });
       }
@@ -888,6 +1119,10 @@
           return "API unavailable. Check your internet connection and try again.";
         }
 
+        if (error?.code === "CONTRACT") {
+          return "The API response format changed unexpectedly. The client blocked inconsistent data to protect the dashboard.";
+        }
+
         if (error?.status === 404) {
           return "Requested resource was not found (404).";
         }
@@ -899,42 +1134,77 @@
         return "Unexpected error while loading data.";
       }
 
+      function renderApp() {
+        renderUsers(state.visibleUsers, state.selectedUserId);
+        renderPosts(state.posts, state.openPostId);
+        renderPostsCaption();
+        updateMetrics();
+
+        if (state.openPostId && state.commentsByPostId[state.openPostId]) {
+          renderComments(state.openPostId, state.commentsByPostId[state.openPostId]);
+          requestAnimationFrame(syncOpenCommentsPanel);
+        }
+      }
+
+      function closeCommentsPanel() {
+        if (!state.openPostId) return;
+        state.openPostId = null;
+        renderApp();
+      }
+
+      async function refreshCurrentView() {
+        const currentUserId = state.selectedUserId;
+        await loadUsers();
+
+        if (currentUserId) {
+          await loadPostsForUser(currentUserId);
+        }
+      }
+
       async function loadUsers() {
+        const requestId = ++state.requestIds.users;
         hideError();
         showUsersLoading(true);
+        setRefreshState(true);
 
         try {
           state.users = await getUsers();
+          if (requestId !== state.requestIds.users) return;
           applyUsersFilter();
-          renderUsers(state.visibleUsers, state.selectedUserId);
-          updateMetrics();
+          renderApp();
         } catch (error) {
           showError(mapErrorToMessage(error));
         } finally {
-          showUsersLoading(false);
+          if (requestId === state.requestIds.users) {
+            showUsersLoading(false);
+            setRefreshState(false);
+          }
         }
       }
 
       async function loadPostsForUser(userId) {
+        const requestId = ++state.requestIds.posts;
         hideError();
         showPostsLoading(true);
+        setRefreshState(true);
 
         try {
           state.selectedUserId = userId;
           state.openPostId = null;
           state.commentsByPostId = {};
           state.posts = [];
-          renderUsers(state.visibleUsers, state.selectedUserId);
-          renderPosts(state.posts, state.openPostId);
-          updateMetrics();
+          renderApp();
 
           state.posts = await getPostsByUser(userId);
-          renderPosts(state.posts, state.openPostId);
-          updateMetrics();
+          if (requestId !== state.requestIds.posts) return;
+          renderApp();
         } catch (error) {
           showError(mapErrorToMessage(error));
         } finally {
-          showPostsLoading(false);
+          if (requestId === state.requestIds.posts) {
+            showPostsLoading(false);
+            setRefreshState(false);
+          }
         }
       }
 
@@ -949,23 +1219,28 @@
         }
 
         state.openPostId = postId;
-        renderPosts(state.posts, state.openPostId);
+        renderApp();
+        renderCommentsLoading(postId);
+        requestAnimationFrame(syncOpenCommentsPanel);
 
         if (state.commentsByPostId[postId]) {
           renderComments(postId, state.commentsByPostId[postId]);
-          updateMetrics();
+          requestAnimationFrame(syncOpenCommentsPanel);
           return;
         }
 
-        renderCommentsLoading(postId);
+        const requestId = ++state.requestIds.comments;
 
         try {
           const comments = await getCommentsByPost(postId);
+          if (requestId !== state.requestIds.comments) return;
           state.commentsByPostId[postId] = comments;
           if (state.openPostId === postId) {
             renderComments(postId, comments);
+            renderPostsCaption();
+            updateMetrics();
+            requestAnimationFrame(syncOpenCommentsPanel);
           }
-          updateMetrics();
         } catch (error) {
           showError(mapErrorToMessage(error));
         }
@@ -996,13 +1271,31 @@
         dom.searchInput.addEventListener("input", (event) => {
           state.searchQuery = event.target.value;
           applyUsersFilter();
-          renderUsers(state.visibleUsers, state.selectedUserId);
-          updateMetrics();
+          renderApp();
+        });
+
+        dom.refreshButton.addEventListener("click", () => {
+          refreshCurrentView();
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            closeCommentsPanel();
+          }
+        });
+
+        window.addEventListener("resize", () => {
+          requestAnimationFrame(syncOpenCommentsPanel);
+        });
+
+        dom.postsContainer.addEventListener("scroll", () => {
+          requestAnimationFrame(syncOpenCommentsPanel);
         });
       }
 
       async function init() {
         bindEvents();
+        renderApp();
         await loadUsers();
       }
 
